@@ -120,14 +120,14 @@ def remove(piece, grid):
 
 def sort_by_grid(locs, grid_size):
     sorted_locs = collections.defaultdict(list)
-    for i in range(grid_size):
-        for j in range(grid_size):
-            for k in range(grid_size):
-                for piece in locs:
-                    for loc in locs[piece]:
-                        for x in range(loc.shape[1]):
-                            if tuple(loc[:, x]) == (i, j, k):
-                                sorted_locs[(i, j, k)].append((piece, loc))
+    r = range(grid_size)
+    for index in itertools.product(r, r, r):
+        for piece in locs:
+            for loc in locs[piece]:
+                for x in range(loc.shape[1]):
+                    if tuple(loc[:, x]) == index:
+                        sorted_locs[index].append((piece, loc))
+                        continue
     return sorted_locs
 
 
@@ -136,7 +136,8 @@ def hsh(array):
 
 
 def next_try(grid, slocs, used, tried):
-    for index in itertools.product(range(4), range(4), range(4)):
+    r = range(grid.shape[0])
+    for index in itertools.product(r, r, r):
         if not grid[index]:
             #log.debug('looking for %s,%s,%s', i, j, k)
             for n, o in slocs[index]:
@@ -149,7 +150,6 @@ def next_try(grid, slocs, used, tried):
                             break
                         else:
                             #log.debug('oops: %s', e)
-                            tried[len(used)].append(hsh(o))
                             continue
         if not grid[index]:
             #log.debug('failed to fill %s,%s,%s', i, j, k)
