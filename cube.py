@@ -37,23 +37,23 @@ TRANS_Z = numpy.array([0, 0, 1]).reshape(3, 1)
 
 
 def orientations(piece):
+    # First get all six orientations as on a die.
     front = piece
     top = numpy.dot(ROTATE_YZ, piece)
     back = numpy.dot(ROTATE_YZ, numpy.dot(ROTATE_YZ, piece))
-    bottom = numpy.dot(ROTATE_YZ,
-                       numpy.dot(ROTATE_YZ,
-                                 numpy.dot(ROTATE_YZ, piece)))
+    # Inverse of rotation is transpose of the matrix.
+    bottom = numpy.dot(ROTATE_YZ.T, piece)
     left = numpy.dot(ROTATE_XY, piece)
-    right = numpy.dot(ROTATE_XY,
-                      numpy.dot(ROTATE_XY,
-                                numpy.dot(ROTATE_XY, piece)))
+    right = numpy.dot(ROTATE_XY.T, piece)
     sides = (front, top, back, bottom, left, right)
+    # For each side of the die, there four rotations.
     all_os = []
     for s in sides:
         all_os.append(s)
         for i in range(3):
             s = numpy.dot(ROTATE_XY, s)
             all_os.append(s)
+    # Remove any duplicate orientations.
     unique_os = []
     for a in all_os:
         matched = False
@@ -187,12 +187,12 @@ if __name__ == '__main__':
     locs = {}
     for i, p in enumerate(PIECES):
         alocs = locations(p, 4)
-        log.info('%s', len(alocs))
+        log.info('Piece %d has %s locations', i, len(alocs))
         locs[i] = alocs
 
-    slocs = sort_by_grid(locs, 4)
-    for s in sorted(slocs.keys()):
-        log.info('%s: %s', s, len(slocs[s]))
+    sorted_locs = sort_by_grid(locs, 4)
+    for s in sorted(sorted_locs.keys()):
+        log.info('Square %s: %s possible pieces', s, len(sorted_locs[s]))
 
     grid = numpy.zeros((4, 4, 4), dtype=numpy.bool)
-    start(grid, slocs)
+    start(grid, sorted_locs)
