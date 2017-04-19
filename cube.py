@@ -1,5 +1,6 @@
 import numpy
 import collections
+import hashlib
 import logging as log
 LOG_FORMAT = '%(levelname)s: %(message)s'
 log.basicConfig(format=LOG_FORMAT, level=log.INFO)
@@ -127,11 +128,8 @@ def sort_by_grid(locs, grid_size):
     return sorted_locs
 
 
-def array_in(array, arrays):
-    for a in arrays:
-        if numpy.array_equal(array, a):
-            return True
-    return False
+def hsh(array):
+    return hashlib.sha1(array.T).hexdigest()
 
 
 def next_try(grid, slocs, used, tried):
@@ -142,7 +140,7 @@ def next_try(grid, slocs, used, tried):
                     log.debug('looking for %s,%s,%s', i, j, k)
                     for n, o in slocs[(i, j, k)]:
                         if n not in used:
-                            if not array_in(o, tried[len(used)]):
+                            if not hsh(o) in tried[len(used)]:
                                 try:
                                     place(o, grid)
                                     used[n] = o
@@ -159,7 +157,7 @@ def next_try(grid, slocs, used, tried):
                     _, last = used.popitem()
                     remove(last, grid)
                     tried[len(used) + 1] = []
-                    tried[len(used)].append(last)
+                    tried[len(used)].append(hsh(last))
                     return False
     # If all squares are filled, we're done.
     return True
