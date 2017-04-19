@@ -84,7 +84,7 @@ def locations(piece, grid_size):
             for j in range(grid_size):
                 for k in range(grid_size):
                     p = o + i * TRANS_X + j * TRANS_Y + k * TRANS_Z
-                    log.debug('i, j, k: %s %s %s %s', i, j, k, p)
+                    #log.debug('i, j, k: %s %s %s %s', i, j, k, p)
                     if numpy.all(p < grid_size):
                         locs.append(p)
     unique_os = []
@@ -137,23 +137,23 @@ def next_try(grid, slocs, used, tried):
         for j in range(4):
             for k in range(4):
                 if not grid[i, j, k]:
-                    log.debug('looking for %s,%s,%s', i, j, k)
+                    #log.debug('looking for %s,%s,%s', i, j, k)
                     for n, o in slocs[(i, j, k)]:
                         if n not in used:
                             if not hsh(o) in tried[len(used)]:
                                 try:
                                     place(o, grid)
                                     used[n] = o
-                                    log.debug('placed: %s', o)
-                                    log.debug('placed: grid %s', grid)
+                                    #log.debug('placed: %s', o)
+                                    #log.debug('placed: grid %s', grid)
                                     break
                                 except Exception as e:
-                                    log.debug('oops: %s', e)
+                                    #log.debug('oops: %s', e)
                                     continue
                 if not grid[i, j, k]:
-                    log.debug('failed to fill %s,%s,%s', i, j, k)
-                    log.debug('stuck on %s', grid)
-                    log.debug('used: %s', used.keys())
+                    #log.debug('failed to fill %s,%s,%s', i, j, k)
+                    #log.debug('stuck on %s', grid)
+                    #log.debug('used: %s', used.keys())
                     _, last = used.popitem()
                     remove(last, grid)
                     tried[len(used) + 1] = []
