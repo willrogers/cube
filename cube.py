@@ -101,21 +101,21 @@ def locations(piece, grid_size):
 
 
 def place(piece, grid):
-    p = piece.T
-    for s in p:
+    for s in piece:
         if grid[tuple(s)]:
             return False
-    for s in p:
+    for s in piece:
         grid[tuple(s)] = True
     return True
 
 
 def remove(piece, grid):
-    for i in range(piece.shape[1]):
-        if grid[tuple(piece[:, i])] == False:
-            raise Exception('piece not already here')
-    for i in range(piece.shape[1]):
-        grid[tuple(piece[:, i])] = False
+    for s in piece:
+        if not grid[tuple(s)]:
+            return False
+    for s in piece:
+        grid[tuple(s)] = False
+    return True
 
 
 def sort_by_grid(locs, grid_size):
@@ -126,7 +126,8 @@ def sort_by_grid(locs, grid_size):
             for loc in locs[piece]:
                 for x in range(loc.shape[1]):
                     if tuple(loc[:, x]) == index:
-                        sorted_locs[index].append((piece, loc))
+                        # Transpose locations for later use.
+                        sorted_locs[index].append((piece, loc.T))
                         continue
     return sorted_locs
 
