@@ -119,11 +119,11 @@ def sort_by_grid(locs, grid_size):
     for i in range(grid_size):
         for j in range(grid_size):
             for k in range(grid_size):
-                for p in locs:
-                    for l in locs[p]:
-                        for x in range(l.shape[1]):
-                            if tuple(l[:, x]) == (i, j, k):
-                                sorted_locs[(i, j, k)].append((p, l))
+                for piece in locs:
+                    for loc in locs[piece]:
+                        for x in range(loc.shape[1]):
+                            if tuple(loc[:, x]) == (i, j, k):
+                                sorted_locs[(i, j, k)].append((piece, loc))
     return sorted_locs
 
 
@@ -134,7 +134,7 @@ def array_in(array, arrays):
     return False
 
 
-def restart(grid, slocs, used, tried):
+def next_try(grid, slocs, used, tried):
     for i in range(4):
         for j in range(4):
             for k in range(4):
@@ -152,13 +152,6 @@ def restart(grid, slocs, used, tried):
                                 except Exception as e:
                                     log.debug('oops: %s', e)
                                     continue
-                if numpy.all(grid):
-                    print('done')
-                    for u, o in used.iteritems():
-                        print(u)
-                        print(o)
-                    import sys
-                    sys.exit()
                 if not grid[i, j, k]:
                     log.debug('failed to fill %s,%s,%s', i, j, k)
                     log.debug('stuck on %s', grid)
@@ -167,19 +160,26 @@ def restart(grid, slocs, used, tried):
                     remove(last, grid)
                     tried[len(used) + 1] = []
                     tried[len(used)].append(last)
-                    return
+                    return False
+    # If all squares are filled, we're done.
+    return True
 
 
-def one_try(grid, slocs):
+def start(grid, slocs):
     used = collections.OrderedDict()
     tried = collections.defaultdict(list)
     x = 0
-    while x < 1000000:
+    while True:
         if x % 1000 == 1:
             log.info('iteration %s', x)
             log.info('used: %s', used.keys())
         x = x + 1
-        restart(grid, slocs, used, tried)
+        if next_try(grid, slocs, used, tried):
+            print('done')
+            for u, o in used.iteritems():
+                print(u)
+                print(o)
+            break
 
 
 if __name__ == '__main__':
@@ -193,8 +193,6 @@ if __name__ == '__main__':
     slocs = sort_by_grid(locs, 4)
     for s in sorted(slocs.keys()):
         log.info('%s: %s', s, len(slocs[s]))
-    for i, o in slocs[(0, 0, 0)]:
-        log.info('%s: %s', i, o)
 
     grid = numpy.zeros((4, 4, 4), dtype=numpy.bool)
-    one_try(grid, slocs)
+    start(grid, slocs)
