@@ -127,7 +127,8 @@ def sort_by_grid(locs, grid_size):
                 for x in range(loc.shape[1]):
                     if tuple(loc[:, x]) == index:
                         # Transpose locations for later use.
-                        sorted_locs[index].append((piece, loc.T))
+                        # Hash once per array to save doing it more often later.
+                        sorted_locs[index].append((piece, loc.T, hsh(loc.T)))
                         continue
     return sorted_locs
 
@@ -141,9 +142,9 @@ def next_try(grid, slocs, used, tried):
     for index in itertools.product(r, r, r):
         if not grid[index]:
             #log.debug('looking for %s,%s,%s', i, j, k)
-            for n, o in slocs[index]:
+            for n, o, h in slocs[index]:
                 if n not in used:
-                    if not hsh(o) in tried[len(used)]:
+                    if not h in tried[len(used)]:
                         if place(o, grid):
                             used[n] = o
                             #log.debug('placed: %s', o)
@@ -170,7 +171,7 @@ def summarise(attempt, locs, slocs, used, tried):
     for u in used:
         c = 0
         for l in locs[u]:
-            if numpy.array_equal(l, used[u]):
+            if numpy.array_equal(l.T, used[u]):
                 break
             c += 1
         print('{:2d}:{:3d}  '.format(u, c), end="")
