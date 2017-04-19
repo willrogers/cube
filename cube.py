@@ -165,17 +165,30 @@ def next_try(grid, slocs, used, tried):
     return True
 
 
-def start(grid, slocs):
+def summarise(attempt, locs, slocs, used, tried):
+    print('iteration {:6d}  '.format(attempt), end="")
+    for u in used:
+        c = 0
+        for l in locs[u]:
+            if numpy.array_equal(l, used[u]):
+                break
+            c += 1
+        print('{:2d}:{:3d}  '.format(u, c), end="")
+    print('\ntried:            ', end='')
+    for t in tried:
+        print('{:2d}:{:3d}  '.format(t, len(tried[t])), end="")
+    print('')
+
+
+def start(grid, locs, slocs):
     used = collections.OrderedDict()
     tried = collections.defaultdict(list)
     target = 1
-    attempt = 0
+    attempt = 1
     found = 0
     while True:
         if attempt % 1000 == 0:
-            log.info('iteration %s', attempt)
-            log.info('used: %s', used.keys())
-        attempt = attempt + 1
+            summarise(attempt, locs, slocs, used, tried)
         if next_try(grid, slocs, used, tried):
             found += 1
             print('Found {}'.format(found))
@@ -188,6 +201,7 @@ def start(grid, slocs):
             tried[len(used)].append(hsh(last))
             if found == target:
                 break
+        attempt = attempt + 1
 
 
 if __name__ == '__main__':
@@ -203,4 +217,4 @@ if __name__ == '__main__':
         log.info('Square %s: %s possible pieces', s, len(sorted_locs[s]))
 
     grid = numpy.zeros((4, 4, 4), dtype=numpy.bool)
-    start(grid, sorted_locs)
+    start(grid, locs, sorted_locs)
