@@ -1,0 +1,13 @@
+
+
+# Python cache
+.cache/
+*.pyc
+__pycache__
+
+# Virtualenv
+venv/
+
+# Vim
+*.swp
+*.swo
