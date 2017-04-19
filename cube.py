@@ -129,7 +129,7 @@ def sort_by_grid(locs, grid_size):
 
 
 def hsh(array):
-    return hashlib.sha1(array.T).hexdigest()
+    return hash(array.tostring())
 
 
 def next_try(grid, slocs, used, tried):
