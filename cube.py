@@ -101,11 +101,12 @@ def locations(piece, grid_size):
 
 
 def place(piece, grid):
-    for i in range(piece.shape[1]):
-        if grid[tuple(piece[:, i])] == True:
+    p = piece.T
+    for s in p:
+        if grid[tuple(s)]:
             raise Exception('piece already here')
-    for i in range(piece.shape[1]):
-        grid[tuple(piece[:, i])] = True
+    for s in p:
+        grid[tuple(s)] = True
 
 
 def remove(piece, grid):
