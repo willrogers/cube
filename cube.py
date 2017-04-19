@@ -104,9 +104,10 @@ def place(piece, grid):
     p = piece.T
     for s in p:
         if grid[tuple(s)]:
-            raise Exception('piece already here')
+            return False
     for s in p:
         grid[tuple(s)] = True
+    return True
 
 
 def remove(piece, grid):
@@ -141,14 +142,14 @@ def next_try(grid, slocs, used, tried):
             for n, o in slocs[index]:
                 if n not in used:
                     if not hsh(o) in tried[len(used)]:
-                        try:
-                            place(o, grid)
+                        if place(o, grid):
                             used[n] = o
                             #log.debug('placed: %s', o)
                             #log.debug('placed: grid %s', grid)
                             break
-                        except Exception as e:
+                        else:
                             #log.debug('oops: %s', e)
+                            tried[len(used)].append(hsh(o))
                             continue
         if not grid[index]:
             #log.debug('failed to fill %s,%s,%s', i, j, k)
@@ -166,18 +167,26 @@ def next_try(grid, slocs, used, tried):
 def start(grid, slocs):
     used = collections.OrderedDict()
     tried = collections.defaultdict(list)
-    x = 0
+    target = 1
+    attempt = 0
+    found = 0
     while True:
-        if x % 1000 == 1:
-            log.info('iteration %s', x)
+        if attempt % 1000 == 0:
+            log.info('iteration %s', attempt)
             log.info('used: %s', used.keys())
-        x = x + 1
+        attempt = attempt + 1
         if next_try(grid, slocs, used, tried):
-            print('done')
-            for u, o in used.iteritems():
+            found += 1
+            print('Found {}'.format(found))
+            for u, o in used.items():
                 print(u)
                 print(o)
-            break
+            _, last = used.popitem()
+            remove(last, grid)
+            tried[len(used) + 1] = []
+            tried[len(used)].append(hsh(last))
+            if found == target:
+                break
 
 
 if __name__ == '__main__':
