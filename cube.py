@@ -1,6 +1,7 @@
 import numpy
 import collections
 import hashlib
+import itertools
 import logging as log
 LOG_FORMAT = '%(levelname)s: %(message)s'
 log.basicConfig(format=LOG_FORMAT, level=log.INFO)
@@ -133,32 +134,30 @@ def hsh(array):
 
 
 def next_try(grid, slocs, used, tried):
-    for i in range(4):
-        for j in range(4):
-            for k in range(4):
-                if not grid[i, j, k]:
-                    #log.debug('looking for %s,%s,%s', i, j, k)
-                    for n, o in slocs[(i, j, k)]:
-                        if n not in used:
-                            if not hsh(o) in tried[len(used)]:
-                                try:
-                                    place(o, grid)
-                                    used[n] = o
-                                    #log.debug('placed: %s', o)
-                                    #log.debug('placed: grid %s', grid)
-                                    break
-                                except Exception as e:
-                                    #log.debug('oops: %s', e)
-                                    continue
-                if not grid[i, j, k]:
-                    #log.debug('failed to fill %s,%s,%s', i, j, k)
-                    #log.debug('stuck on %s', grid)
-                    #log.debug('used: %s', used.keys())
-                    _, last = used.popitem()
-                    remove(last, grid)
-                    tried[len(used) + 1] = []
-                    tried[len(used)].append(hsh(last))
-                    return False
+    for index in itertools.product(range(4), range(4), range(4)):
+        if not grid[index]:
+            #log.debug('looking for %s,%s,%s', i, j, k)
+            for n, o in slocs[index]:
+                if n not in used:
+                    if not hsh(o) in tried[len(used)]:
+                        try:
+                            place(o, grid)
+                            used[n] = o
+                            #log.debug('placed: %s', o)
+                            #log.debug('placed: grid %s', grid)
+                            break
+                        except Exception as e:
+                            #log.debug('oops: %s', e)
+                            continue
+        if not grid[index]:
+            #log.debug('failed to fill %s,%s,%s', i, j, k)
+            #log.debug('stuck on %s', grid)
+            #log.debug('used: %s', used.keys())
+            _, last = used.popitem()
+            remove(last, grid)
+            tried[len(used) + 1] = []
+            tried[len(used)].append(hsh(last))
+            return False
     # If all squares are filled, we're done.
     return True
 
