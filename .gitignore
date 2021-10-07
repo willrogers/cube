@@ -1,4 +1,7 @@
-
+# Cython build products
+*.c
+*.so
+/build/
 
 # Python cache
 .cache/
@@ -6,7 +9,7 @@
 __pycache__
 
 # Virtualenv
-venv/
+/venv*/
 
 # Vim
 *.swp
