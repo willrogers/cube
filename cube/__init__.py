@@ -205,7 +205,7 @@ def start(grid, locs, slocs):
         attempt = attempt + 1
 
 
-if __name__ == '__main__':
+def run():
 
     locs = {}
     for i, p in enumerate(PIECES):
